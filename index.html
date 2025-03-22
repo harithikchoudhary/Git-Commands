@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Commands Cheat Sheet</title>
+    <style>
+        :root {
+            --primary-color: #2d333b;
+            --secondary-color: #444c56;
+            --accent-color: #0366d6;
+            --text-color: #adbac7;
+            --light-text: #d0d7de;
+            --highlight: #388bfd;
+            --bg-light: #22272e;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--light-text);
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: var(--light-text);
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: var(--highlight);
+            margin-top: 25px;
+        }
+
+        .intro {
+            background-color: var(--bg-light);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .command-section {
+            margin-bottom: 40px;
+        }
+
+        .command-block {
+            background-color: var(--bg-light);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .command {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .note {
+            background-color: rgba(3, 102, 214, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: rgba(210, 153, 34, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .tip {
+            background-color: rgba(63, 185, 80, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .workflow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--bg-light);
+            border-radius: 5px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child):after {
+            content: "→";
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            font-size: 20px;
+            color: var(--highlight);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: var(--light-text);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        @media (max-width: 768px) {
+            .workflow-step:not(:last-child):after {
+                content: "↓";
+                right: 50%;
+                top: auto;
+                bottom: -15px;
+            }
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 0 5px 5px 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tabs-container {
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Git & GitHub Commands Cheat Sheet</h1>
+            <p>A comprehensive guide to Git and GitHub for version control</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <h2>Introduction to Git and GitHub</h2>
+            <p><strong>Git</strong> is a free and open source distributed version control system designed to handle
+                everything from small to very large projects with speed and efficiency.</p>
+            <p><strong>GitHub</strong> is a web-based hosting service for Git repositories that provides collaboration
+                features, code review, and issue tracking.</p>
+            <div class="note">
+                <p><strong>Key difference:</strong> Git is the tool that tracks changes in your code, while GitHub is a
+                    website where you host your repositories.</p>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Getting Started</h2>
+
+            <div class="command-block">
+                <h3>Configuring Git</h3>
+                <p>Before you start using Git, you need to configure your identity:</p>
+                <div class="command">git config --global user.name "Your Name"</div>
+                <div class="command">git config --global user.email "your.email@example.com"</div>
+                <p>Verify your configuration:</p>
+                <div class="command">git config --list</div>
+                <div class="tip">
+                    <p>Using <code>--global</code> sets this configuration for all your Git repositories. To set it just
+                        for a specific repository, navigate to that repository and omit <code>--global</code>.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Creating a Repository</h3>
+                <p>Initialize a new Git repository in your project folder:</p>
+                <div class="command">git init</div>
+                <p>This creates a hidden .git directory that contains the Git database and configuration.</p>
+            </div>
+
+            <div class="command-block">
+                <h3>Cloning an Existing Repository</h3>
+                <p>Create a copy of an existing Git repository:</p>
+                <div class="command">git clone "https://github.com/username/repository.git"</div>
+                <p>Clone with SSH (requires SSH key setup):</p>
+                <div class="command">git clone "git@github.com:username/repository.git"</div>
+                <div class="note">
+                    <p>HTTPS is easier to set up but requires entering your credentials each time. SSH is more secure
+                        and doesn't require password entry after setup.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Basic Git Commands</h2>
+
+            <div class="command-block">
+                <h3>Checking Status</h3>
+                <p>View the status of your working directory:</p>
+                <div class="command">git status</div>
+                <p>This command shows:</p>
+                <ul>
+                    <li>Current branch</li>
+                    <li>Changed files that are not staged</li>
+                    <li>Changes that are staged but not committed</li>
+                    <li>Files that are not tracked by Git</li>
+                </ul>
+            </div>
+
+            <div class="command-block">
+                <h3>Adding Files</h3>
+                <p>Add files to the staging area:</p>
+                <div class="command">git add filename.txt</div>
+                <p>Add multiple specific files:</p>
+                <div class="command">git add file1.txt file2.txt</div>
+                <p>Add all changed files:</p>
+                <div class="command">git add .</div>
+                <div class="note">
+                    <p>The staging area is a middle ground between your working directory and the repository. It allows
+                        you to prepare a set of changes before committing them.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Committing Changes</h3>
+                <p>Record the changes in the repository:</p>
+                <div class="command">git commit -m "Add a descriptive commit message here"</div>
+                <p>Add and commit in one step (for already tracked files):</p>
+                <div class="command">git commit -am "Updated existing files"</div>
+                <div class="tip">
+                    <p>Write meaningful commit messages that explain <em>why</em> a change was made, not just
+                        <em>what</em> was changed.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Pushing Changes</h3>
+                <p>Upload local repository content to a remote repository:</p>
+                <div class="command">git push origin main</div>
+                <p>Set upstream and push (first time):</p>
+                <div class="command">git push -u origin main</div>
+                <p>After setting upstream, you can simply use:</p>
+                <div class="command">git push</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Working with Remotes</h3>
+                <p>Add a remote repository:</p>
+                <div class="command">git remote add origin https://github.com/username/repository.git</div>
+                <p>View remote repositories:</p>
+                <div class="command">git remote -v</div>
+                <p>Remove a remote:</p>
+                <div class="command">git remote remove origin</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Pulling Changes</h3>
+                <p>Fetch and merge changes from the remote repository:</p>
+                <div class="command">git pull origin main</div>
+                <p>This is equivalent to:</p>
+                <div class="command">git fetch origin</div>
+                <div class="command">git merge origin/main</div>
+                <div class="note">
+                    <p><code>git fetch</code> downloads changes without merging them, while <code>git pull</code>
+                        fetches and merges in one step.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Working with Branches</h2>
+
+            <div class="command-block">
+                <h3>Branch Management</h3>
+                <p>List all branches:</p>
+                <div class="command">git branch</div>
+                <p>Create a new branch:</p>
+                <div class="command">git branch feature-name</div>
+                <p>Create and switch to new branch in one command:</p>
+                <div class="command">git checkout -b feature-name</div>
+                <p>Switch to an existing branch:</p>
+                <div class="command">git checkout branch-name</div>
+                <p>Delete a branch (after merging):</p>
+                <div class="command">git branch -d branch-name</div>
+                <p>Force delete a branch (even if not merged):</p>
+                <div class="command">git branch -D branch-name</div>
+                <p>Rename current branch:</p>
+                <div class="command">git branch -M main</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Pushing a New Branch</h3>
+                <p>Push a branch to remote and set up tracking:</p>
+                <div class="command">git push --set-upstream origin feature-name</div>
+                <p>Short form:</p>
+                <div class="command">git push -u origin feature-name</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Comparing and Merging</h3>
+                <p>View differences between branches:</p>
+                <div class="command">git diff branch1 branch2</div>
+                <p>Merge a branch into your current branch:</p>
+                <div class="command">git merge branch-name</div>
+                <div class="warning">
+                    <p>Before merging, make sure to commit or stash any changes in your working directory to avoid
+                        conflicts.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Handling Merge Conflicts</h2>
+
+            <div class="command-block">
+                <h3>Understanding Merge Conflicts</h3>
+                <p>Merge conflicts occur when Git can't automatically resolve differences between two commits. This
+                    typically happens when two branches have made changes to the same part of the same file.</p>
+
+                <div class="note">
+                    <p>Git marks the conflicted areas in files with special markers:</p>
+                    <pre>
+<<<<<<< HEAD
+Your changes
+=======
+Their changes
+>>>>>>> branch-name
+                </pre>
+                </div>
+
+                <h3>Resolving Conflicts</h3>
+                <p>Steps to resolve merge conflicts:</p>
+                <ol>
+                    <li>Run <code>git status</code> to see which files have conflicts</li>
+                    <li>Open the conflicted files in your editor and look for the conflict markers</li>
+                    <li>Edit the files to resolve the conflicts (remove the markers and keep the desired code)</li>
+                    <li>Add the resolved files: <code>git add &lt;filename&gt;</code></li>
+                    <li>Continue with the merge: <code>git merge --continue</code> or create a new commit</li>
+                </ol>
+
+                <div class="tip">
+                    <p>Use visual merge tools like VS Code, GitKraken, or SourceTree to make resolving conflicts easier.
+                    </p>
+                </div>
+
+                <h3>Abort a Merge</h3>
+                <p>If you want to cancel a merge that has conflicts:</p>
+                <div class="command">git merge --abort</div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Fixing Mistakes</h2>
+
+            <div class="command-block">
+                <h3>Unstaging Files</h3>
+                <p>Remove files from the staging area:</p>
+                <div class="command">git reset filename</div>
+                <p>Remove all files from staging:</p>
+                <div class="command">git reset</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Undoing Commits</h3>
+                <p>Undo the most recent commit, keeping changes staged:</p>
+                <div class="command">git reset --soft HEAD~1</div>
+                <p>Undo the most recent commit, unstaging changes:</p>
+                <div class="command">git reset HEAD~1</div>
+                <p>Undo multiple commits (e.g., last 3):</p>
+                <div class="command">git reset HEAD~3</div>
+                <p>Undo commits and discard all changes (CAUTION - data loss):</p>
+                <div class="command">git reset --hard HEAD~1</div>
+                <div class="warning">
+                    <p><code>--hard</code> flag will permanently discard changes. Use with caution!</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Reverting Commits</h3>
+                <p>Create a new commit that undoes a previous commit:</p>
+                <div class="command">git revert commit-hash</div>
+                <p>Find commit hashes with:</p>
+                <div class="command">git log</div>
+                <div class="tip">
+                    <p><code>revert</code> is safer than <code>reset</code> for shared branches because it doesn't
+                        rewrite history.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Recovering Lost Changes</h3>
+                <p>View reference logs (reflog) to find lost commits:</p>
+                <div class="command">git reflog</div>
+                <p>Restore a branch to a specific reflog entry:</p>
+                <div class="command">git reset --hard HEAD@{n}</div>
+                <p>Where <code>n</code> is the entry number from reflog.</p>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Advanced Git Concepts</h2>
+
+            <div class="command-block">
+                <h3>Stashing Changes</h3>
+                <p>Temporarily store modified files:</p>
+                <div class="command">git stash</div>
+                <p>List stashed changes:</p>
+                <div class="command">git stash list</div>
+                <p>Apply the most recent stash:</p>
+                <div class="command">git stash apply</div>
+                <p>Apply a specific stash:</p>
+                <div class="command">git stash apply stash@{n}</div>
+                <p>Apply and remove the stash:</p>
+                <div class="command">git stash pop</div>
+                <p>Discard a stash:</p>
+                <div class="command">git stash drop stash@{n}</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Viewing History</h3>
+                <p>View commit history:</p>
+                <div class="command">git log</div>
+                <p>View a compact history:</p>
+                <div class="command">git log --oneline</div>
+                <p>View history with branch graph:</p>
+                <div class="command">git log --oneline --graph --all</div>
+                <p>View changes in a specific commit:</p>
+                <div class="command">git show commit-hash</div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>GitHub Concepts</h2>
+
+            <div class="command-block">
+                <h3>Forking Repositories</h3>
+                <p>A fork is a copy of a repository that allows you to freely experiment without affecting the original
+                    project.</p>
+                <p>Steps to fork:</p>
+                <ol>
+                    <li>Click the "Fork" button on a GitHub repository page</li>
+                    <li>Clone your forked repository to your local machine</li>
+                    <li>Add the original repository as an "upstream" remote to keep your fork in sync</li>
+                </ol>
+                <div class="command">git remote add upstream https://github.com/original-owner/original-repository.git
+                </div>
+                <p>Sync your fork with the original repository:</p>
+                <div class="command">git fetch upstream</div>
+                <div class="command">git checkout main</div>
+                <div class="command">git merge upstream/main</div>
+            </div>
+
+            <div class="command-block">
+                <h3>Pull Requests</h3>
+                <p>Pull requests let you tell others about changes you've pushed to a branch in a repository on GitHub.
+                </p>
+                <p>Workflow for creating a pull request:</p>
+                <ol>
+                    <li>Fork the repository (if it's not yours)</li>
+                    <li>Create a branch for your changes</li>
+                    <li>Make and commit your changes</li>
+                    <li>Push the branch to GitHub</li>
+                    <li>Go to the repository on GitHub and click "Compare & pull request"</li>
+                    <li>Fill in the PR description and create the pull request</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Git Workflow Visualization</h2>
+
+            <div class="workflow">
+                <div class="workflow-step">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Clone/Init</span>
+                    <p>Start with a fresh repository</p>
+                    <div class="command">git clone URL</div>
+                    <div class="command">git init</div>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Branch</span>
+                    <p>Create a branch for your work</p>
+                    <div class="command">git checkout -b feature</div>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Code</span>
+                    <p>Make changes to files</p>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">4</span>
+                    <span class="step-title">Stage</span>
+                    <p>Add changes to staging</p>
+                    <div class="command">git add .</div>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">5</span>
+                    <span class="step-title">Commit</span>
+                    <p>Record your changes</p>
+                    <div class="command">git commit -m "Message"</div>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">6</span>
+                    <span class="step-title">Push</span>
+                    <p>Upload to GitHub</p>
+                    <div class="command">git push -u origin feature</div>
+                </div>
+
+                <div class="workflow-step">
+                    <span class="step-number">7</span>
+                    <span class="step-title">Pull Request</span>
+                    <p>Request to merge your changes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Quick Reference</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Command</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Configure name</td>
+                        <td><code>git config --global user.name "Name"</code></td>
+                    </tr>
+                    <tr>
+                        <td>Configure email</td>
+                        <td><code>git config --global user.email "Email"</code></td>
+                    </tr>
+                    <tr>
+                        <td>Clone repository</td>
+                        <td><code>git clone URL</code></td>
+                    </tr>
+                    <tr>
+                        <td>Check status</td>
+                        <td><code>git status</code></td>
+                    </tr>
+                    <tr>
+                        <td>Stage all changes</td>
+                        <td><code>git add .</code></td>
+                    </tr>
+                    <tr>
+                        <td>Commit changes</td>
+                        <td><code>git commit -m "Message"</code></td>
+                    </tr>
+                    <tr>
+                        <td>Stage & commit (tracked files)</td>
+                        <td><code>git commit -am "Message"</code></td>
+                    </tr>
+                    <tr>
+                        <td>Push to remote</td>
+                        <td><code>git push origin main</code></td>
+                    </tr>
+                    <tr>
+                        <td>Pull from remote</td>
+                        <td><code>git pull origin main</code></td>
+                    </tr>
+                    <tr>
+                        <td>Create & switch to branch</td>
+                        <td><code>git checkout -b branch-name</code></td>
+                    </tr>
+                    <tr>
+                        <td>Switch branch</td>
+                        <td><code>git checkout branch-name</code></td>
+                    </tr>
+                    <tr>
+                        <td>Merge branch</td>
+                        <td><code>git merge branch-name</code></td>
+                    </tr>
+                    <tr>
+                        <td>Delete branch</td>
+                        <td><code>git branch -d branch-name</code></td>
+                    </tr>
+                    <tr>
+                        <td>Unstage file</td>
+                        <td><code>git reset filename</code></td>
+                    </tr>
+                    <tr>
+                        <td>Undo last commit</td>
+                        <td><code>git reset HEAD~1</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="command-section">
+            <h2>Git Best Practices</h2>
+
+            <div class="command-block">
+                <h3>Commit Guidelines</h3>
+                <ul>
+                    <li>Make small, focused commits that do one thing</li>
+                    <li>Write clear commit messages (start with a verb, keep under 50 characters)</li>
+                    <li>Group related changes in a single commit</li>
+                    <li>Commit often to avoid losing work</li>
+                </ul>
+
+                <div class="tip">
+                    <p>Consider using conventional commits format: <code>type(scope): description</code><br>
+                        Example: <code>feat(auth): add login button to navbar</code></p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Branching Strategy</h3>
+                <p>Common branching models:</p>
+                <ul>
+                    <li><strong>Git Flow:</strong> main, develop, feature/, release/, hotfix/ branches</li>
+                    <li><strong>GitHub Flow:</strong> main branch with feature branches</li>
+                    <li><strong>Trunk-Based Development:</strong> Small changes directly to main or short-lived feature
+                        branches</li>
+                </ul>
+
+                <div class="note">
+                    <p>Choose a branching strategy that works for your team size and release schedule.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Pull Request Tips</h3>
+                <ul>
+                    <li>Keep PRs small and focused on a single issue</li>
+                    <li>Include a clear description of what changes were made and why</li>
+                    <li>Reference related issues (#123)</li>
+                    <li>Add screenshots for UI changes</li>
+                    <li>Request reviews from appropriate team members</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Git & GitHub Commands Cheat Sheet - A comprehensive reference guide</p>
+        <p>References: <a href="https://git-scm.com/docs" style="color: var(--light-text);">Git Documentation</a> | <a
+                href="https://docs.github.com" style="color: var(--light-text);">GitHub Documentation</a></p>
+    </footer>
+
+</body>
+
+</html>
