@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Line Basics - Input & Output Environment</title>
+    <style>
+        :root {
+            --primary-color: #2d2d2d;
+            --secondary-color: #3c3c3c;
+            --accent-color: #75b798;
+            --text-color: #e8e8e8;
+            --light-text: #ffffff;
+            --highlight: #ffc107;
+            --bg-light: #363636;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --code-bg: #202020;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--light-text);
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: var(--highlight);
+            margin-top: 25px;
+        }
+
+        .intro {
+            background-color: var(--bg-light);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .command-section {
+            margin-bottom: 40px;
+        }
+
+        .command-block {
+            background-color: var(--bg-light);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .command {
+            background-color: var(--code-bg);
+            color: var(--light-text);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .command::before {
+            content: "$";
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        .command-output {
+            background-color: var(--code-bg);
+            color: var(--text-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1rem;
+            overflow-x: auto;
+            margin: 0 0 15px 0;
+            border-top: none;
+            white-space: pre-wrap;
+        }
+
+        .note {
+            background-color: rgba(117, 183, 152, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        .tip {
+            background-color: rgba(39, 174, 96, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .terminal-window {
+            background-color: var(--code-bg);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .terminal-header {
+            background-color: var(--secondary-color);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .control.close {
+            background-color: #ff5f56;
+        }
+
+        .control.minimize {
+            background-color: #ffbd2e;
+        }
+
+        .control.maximize {
+            background-color: #27c93f;
+        }
+
+        .terminal-title {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .terminal-body {
+            padding: 15px;
+            font-family: monospace;
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100px;
+        }
+
+        .prompt {
+            color: var(--accent-color);
+            margin-right: 8px;
+        }
+
+        .command-row {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .output-row {
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--light-text);
+        }
+
+        .path-example {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .path {
+            background-color: var(--code-bg);
+            color: var(--light-text);
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .path.absolute {
+            color: #42b983;
+        }
+
+        .path.relative {
+            color: #e6a23c;
+        }
+
+        .path-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            margin-bottom: -5px;
+        }
+
+        .highlight {
+            color: var(--highlight);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .command {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Command Line Basics: Input & Output Environment</h1>
+            <p>Your guide to essential terminal commands and navigation</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <h2>Introduction to the Command Line</h2>
+            <p>The command line interface (CLI) provides a powerful text-based way to interact with your computer's
+                operating system. Understanding basic commands allows you to navigate, create, and manipulate files and
+                directories efficiently.</p>
+
+            <div class="note">
+                <p>This guide focuses on Unix-like systems (Linux, macOS). Windows users can use Windows Subsystem for
+                    Linux (WSL) or Git Bash to follow along.</p>
+            </div>
+
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="window-controls">
+                        <div class="control close"></div>
+                        <div class="control minimize"></div>
+                        <div class="control maximize"></div>
+                    </div>
+                    <div class="terminal-title">user@hostname:~</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="command-row"><span class="prompt">$</span>echo "Welcome to the command line!"</div>
+                    <div class="output-row">Welcome to the command line!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Basic Commands</h2>
+
+            <div class="command-block">
+                <h3>Listing Files and Directories</h3>
+                <p>The <code>ls</code> command displays the contents of the current directory:</p>
+                <div class="command">ls</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">$</span>ls</div>
+                        <div class="output-row">Documents Downloads Music Pictures Videos</div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <p>The <code>ls</code> command is one of the most frequently used commands for quickly checking
+                        directory contents.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Present Working Directory</h3>
+                <p>The <code>pwd</code> command shows your current location in the file system:</p>
+                <div class="command">pwd</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">$</span>pwd</div>
+                        <div class="output-row">/home/username</div>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <p>It's helpful to use <code>pwd</code> whenever you're unsure of your current location in the file
+                        system.</p>
+                </div>
+            </div>
+
+            <div class="command-block">
+                <h3>Clearing the Terminal</h3>
+                <p>The <code>clear</code> command cleans up your terminal screen:</p>
+                <div class="command">clear</div>
+
+                <div class="tip">
+                    <p>Shortcut: You can also use <code>Ctrl+L</code> to clear the terminal in most systems.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Navigation</h2>
+
+            <div class="command-block">
+                <h3>Change Directory (cd)</h3>
+                <p>The <code>cd</code> command allows you to navigate between directories:</p>
+
+                <h4>Moving into a directory:</h4>
+                <div class="command">cd Desktop</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>cd Desktop</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~/Desktop$</span></div>
+                    </div>
+                </div>
+
+                <h4>Moving out of the current directory (going back):</h4>
+                <div class="command">cd ..</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~/Desktop$</span>cd ..</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span></div>
+                    </div>
+                </div>
+
+                <h4>Navigating multiple directories at once:</h4>
+                <div class="command">cd Desktop/folder1</div>
+
+                <h4>Moving out multiple steps:</h4>
+                <div class="command">cd ../..</div>
+
+                <div class="tip">
+                    <p>Use <code>cd</code> without any arguments to return to your home directory from anywhere.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Paths</h2>
+
+            <div class="command-block">
+                <h3>Relative vs. Absolute Paths</h3>
+                <p>Paths in the command line can be specified in two ways:</p>
+
+                <div class="path-example">
+                    <div class="path-label">Relative Path (relative to current location):</div>
+                    <div class="path relative">Documents/Projects</div>
+
+                    <div class="path-label">Absolute Path (starts from root directory):</div>
+                    <div class="path absolute">/home/username/Documents/Projects</div>
+                </div>
+
+                <div class="note">
+                    <p><strong>Relative paths</strong> are specified relative to your current location.</p>
+                    <p><strong>Absolute paths</strong> always start with a forward slash (<code>/</code>) and specify
+                        the complete path from the root directory.</p>
+                </div>
+
+                <h3>Special Path Symbols</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/</code></td>
+                            <td>Root directory</td>
+                            <td><code>cd /</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>~</code></td>
+                            <td>Home directory</td>
+                            <td><code>cd ~</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>.</code></td>
+                            <td>Current directory</td>
+                            <td><code>cd ./Documents</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>..</code></td>
+                            <td>Parent directory</td>
+                            <td><code>cd ..</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Moving to home directory:</h4>
+                <div class="command">cd ~</div>
+
+                <h4>Moving to root directory:</h4>
+                <div class="command">cd /</div>
+
+                <div class="tip">
+                    <p>The root directory (<code>/</code>) contains the entire file system, while your home directory
+                        (<code>~</code>) contains your personal files.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Creating Directories</h2>
+
+            <div class="command-block">
+                <h3>Making Directories with mkdir</h3>
+                <p>The <code>mkdir</code> command creates new directories:</p>
+
+                <h4>Create a simple directory:</h4>
+                <div class="command">mkdir newDir</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>mkdir newDir</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls</div>
+                        <div class="output-row">Documents Downloads Music newDir Pictures Videos</div>
+                    </div>
+                </div>
+
+                <h4>Create a directory at a specific path:</h4>
+                <div class="command">mkdir Desktop/folder1/newDir2</div>
+
+                <h4>Create nested directories in one command:</h4>
+                <div class="command">mkdir -p Projects/website/css</div>
+
+                <div class="note">
+                    <p>The <code>-p</code> flag allows you to create parent directories if they don't exist.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Command Flags</h2>
+
+            <div class="command-block">
+                <h3>Using Flags to Modify Commands</h3>
+                <p>Flags are special options that modify how commands behave:</p>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls -l</div>
+                        <div class="output-row">drwxr-xr-x 2 username group 4096 Mar 22 10:30 Documents
+                            drwxr-xr-x 2 username group 4096 Mar 21 15:45 Downloads
+                            drwxr-xr-x 2 username group 4096 Mar 20 09:15 Music
+                            drwxr-xr-x 2 username group 4096 Mar 22 11:20 newDir
+                            drwxr-xr-x 2 username group 4096 Mar 19 14:30 Pictures
+                            drwxr-xr-x 2 username group 4096 Mar 18 16:50 Videos</div>
+                    </div>
+                </div>
+
+                <h4>Commonly used flags with ls:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flag</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>-l</code></td>
+                            <td>Long format with details about files</td>
+                            <td><code>ls -l</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>-a</code></td>
+                            <td>Show hidden files (starting with .)</td>
+                            <td><code>ls -a</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>-h</code></td>
+                            <td>Human-readable file sizes</td>
+                            <td><code>ls -lh</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>-R</code></td>
+                            <td>Recursive listing (includes subdirectories)</td>
+                            <td><code>ls -R</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tip">
+                    <p>Flags can be combined: <code>ls -la</code> shows hidden files in long format.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Manual Pages</h2>
+
+            <div class="command-block">
+                <h3>Getting Help with man</h3>
+                <p>The <code>man</code> command displays the manual pages for commands:</p>
+                <div class="command">man ls</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>man ls</div>
+                        <div class="output-row">LS(1) User Commands LS(1)
+
+                            NAME
+                            ls - list directory contents
+
+                            SYNOPSIS
+                            ls [OPTION]... [FILE]...
+
+                            DESCRIPTION
+                            List information about the FILEs (the current directory by default).
+                            Sort entries alphabetically if none of -cftuvSUX nor --sort is
+                            specified.
+
+                            Mandatory arguments to long options are mandatory for short options
+                            too.
+
+                            -a, --all
+                            do not ignore entries starting with .
+
+                            -l use a long listing format
+
+                            ...
+
+                            Manual page ls(1) line 1</div>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <p>Navigate manual pages using arrow keys, space (next page), b (back), and q (quit).</p>
+                </div>
+
+                <div class="tip">
+                    <p>If you just want a brief summary of a command, try <code>command --help</code> or
+                        <code>command -h</code>.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Creating Files</h2>
+
+            <div class="command-block">
+                <h3>Using touch to Create Files</h3>
+                <p>The <code>touch</code> command creates empty files or updates file timestamps:</p>
+                <div class="command">touch index.html</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>touch index.html</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls</div>
+                        <div class="output-row">Documents Downloads index.html Music newDir Pictures Videos</div>
+                    </div>
+                </div>
+
+                <h4>Create multiple files at once:</h4>
+                <div class="command">touch style.css script.js README.md</div>
+
+                <div class="note">
+                    <p>While <code>touch</code> is commonly used to create new files, its original purpose is to update
+                        the access and modification timestamps of existing files.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Deleting Files and Directories</h2>
+
+            <div class="command-block">
+                <h3>Removing Files with rm</h3>
+                <p>The <code>rm</code> command removes files:</p>
+                <div class="command">rm filename.txt</div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>touch temp.txt</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls</div>
+                        <div class="output-row">Documents Downloads index.html Music newDir Pictures temp.txt Videos
+                        </div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>rm temp.txt</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls</div>
+                        <div class="output-row">Documents Downloads index.html Music newDir Pictures Videos</div>
+                    </div>
+                </div>
+
+                <h3>Removing Empty Directories with rmdir</h3>
+                <p>The <code>rmdir</code> command removes empty directories:</p>
+                <div class="command">rmdir emptyFolder</div>
+
+                <h3>Removing Directories with rm -rf</h3>
+                <p>To remove non-empty directories and their contents:</p>
+                <div class="command">rm -rf directoryName</div>
+
+                <div class="danger">
+                    <p><strong>WARNING:</strong> The <code>rm -rf</code> command is extremely powerful and potentially
+                        dangerous. It will delete directories and all their contents without confirmation. Files deleted
+                        this way cannot be recovered from a trash bin.</p>
+                    <p>Be especially careful when using <code>rm -rf</code> with wildcards or as the root user.</p>
+                </div>
+
+                <div class="tip">
+                    <p>Use <code>rm -i</code> for interactive mode, which will prompt for confirmation before deleting
+                        each file.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Quick Reference</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ls</code></td>
+                        <td>List directory contents</td>
+                        <td><code>ls -la</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>pwd</code></td>
+                        <td>Print working directory</td>
+                        <td><code>pwd</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>cd</code></td>
+                        <td>Change directory</td>
+                        <td><code>cd Documents</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>mkdir</code></td>
+                        <td>Create directory</td>
+                        <td><code>mkdir -p path/to/dir</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>touch</code></td>
+                        <td>Create empty file</td>
+                        <td><code>touch file.txt</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>rm</code></td>
+                        <td>Remove files</td>
+                        <td><code>rm file.txt</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>rmdir</code></td>
+                        <td>Remove empty directory</td>
+                        <td><code>rmdir emptyDir</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>rm -rf</code></td>
+                        <td>Remove directory and contents</td>
+                        <td><code>rm -rf directory</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>clear</code></td>
+                        <td>Clear terminal screen</td>
+                        <td><code>clear</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>man</code></td>
+                        <td>Display manual page</td>
+                        <td><code>man ls</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="command-section">
+            <h2>Best Practices</h2>
+
+            <div class="command-block">
+
+                <h3>Command Line Best Practices</h3>
+                <ul>
+                    <li>Use tab completion to avoid typing errors and save time</li>
+                    <li>Be cautious with destructive commands like <code>rm -rf</code></li>
+                    <li>Learn to use relative and absolute paths appropriately</li>
+                    <li>Make use of command history (up arrow) to recall previously used commands</li>
+                    <li>Add meaningful comments to your command line scripts using <code>#</code></li>
+                    <li>Use clear and descriptive names for files and directories</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>Input and Output Environment</h2>
+
+            <div class="command-block">
+                <h3>Standard Streams</h3>
+                <p>The command line operates with three standard streams:</p>
+                <ul>
+                    <li><strong>stdin (0)</strong>: Standard input - data fed into the program</li>
+                    <li><strong>stdout (1)</strong>: Standard output - data printed by the program</li>
+                    <li><strong>stderr (2)</strong>: Standard error - error messages generated by the program</li>
+                </ul>
+            </div>
+
+            <div class="command-block">
+                <h3>Redirection</h3>
+                <p>You can redirect output to files instead of displaying it on the screen:</p>
+
+                <h4>Output Redirection:</h4>
+                <div class="command">ls > files.txt</div>
+                <p>Redirects ls output to files.txt (overwrites)</p>
+
+                <div class="command">ls >> files.txt</div>
+                <p>Appends ls output to files.txt</p>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="window-controls">
+                            <div class="control close"></div>
+                            <div class="control minimize"></div>
+                            <div class="control maximize"></div>
+                        </div>
+                        <div class="terminal-title">Terminal</div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>ls > files.txt</div>
+                        <div class="command-row"><span class="prompt">username@hostname:~$</span>cat files.txt</div>
+                        <div class="output-row">Documents
+                            Downloads
+                            index.html
+                            Music
+                            newDir
+                            Pictures
+                            Videos</div>
+                    </div>
+                </div>
+
+                <h4>Input Redirection:</h4>
+                <div class="command">sort < data.txt</div>
+                        <p>Uses data.txt as input for the sort command</p>
+
+                        <h4>Error Redirection:</h4>
+                        <div class="command">command 2> errors.log</div>
+                        <p>Redirects error messages to errors.log</p>
+
+                        <h4>Combined Redirection:</h4>
+                        <div class="command">command > output.txt 2> errors.log</div>
+                        <p>Separate files for output and errors</p>
+
+                        <div class="command">command > all.log 2>&1</div>
+                        <p>Both output and errors to same file</p>
+
+                        <div class="note">
+                            <p>Redirection is one of the most powerful features of the command line, allowing you to
+                                save, process, and manage command outputs efficiently.</p>
+                        </div>
+                </div>
+
+                <div class="command-block">
+                    <h3>Pipes</h3>
+                    <p>Pipes (<code>|</code>) allow you to use the output of one command as the input for another:</p>
+
+                    <div class="command">ls -l | grep "txt"</div>
+                    <p>Lists only files containing "txt"</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>ls -l | grep "txt"
+                            </div>
+                            <div class="output-row">-rw-r--r-- 1 username group 0 Mar 22 12:35 files.txt</div>
+                        </div>
+                    </div>
+
+                    <div class="command">cat file.txt | sort</div>
+                    <p>Sorts the contents of file.txt</p>
+
+                    <div class="command">ps aux | grep firefox</div>
+                    <p>Finds firefox processes</p>
+
+                    <div class="tip">
+                        <p>You can chain multiple pipes together: <code>command1 | command2 | command3</code></p>
+                    </div>
+                </div>
+
+                <div class="command-block">
+                    <h3>Command Substitution</h3>
+                    <p>You can use the output of a command as part of another command:</p>
+
+                    <div class="command">echo "Today is $(date)"</div>
+                    <p>Embeds the output of date command</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>echo "Today is
+                                $(date)"</div>
+                            <div class="output-row">Today is Sat Mar 22 14:45:23 EDT 2025</div>
+                        </div>
+                    </div>
+
+                    <div class="command">cp file.txt backup-$(date +%Y%m%d).txt</div>
+                    <p>Filename with today's date</p>
+                </div>
+
+                <div class="command-block">
+                    <h3>Environment Variables</h3>
+                    <p>Environment variables store information about your command line environment:</p>
+
+                    <div class="command">echo $HOME</div>
+                    <p>Displays home directory path</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>echo $HOME</div>
+                            <div class="output-row">/home/username</div>
+                        </div>
+                    </div>
+
+                    <div class="command">echo $PATH</div>
+                    <p>Shows executable search paths</p>
+
+                    <div class="command">echo $USER</div>
+                    <p>Shows current username</p>
+
+                    <h4>Setting Variables:</h4>
+                    <div class="command">export NAME="value"</div>
+                    <p>Sets environment variable</p>
+
+                    <div class="command">NAME="value"</div>
+                    <p>Sets local variable</p>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Command Line Text Processing</h2>
+
+                <div class="command-block">
+                    <h3>cat - Concatenate and Display Files</h3>
+                    <div class="command">cat file.txt</div>
+                    <p>Display file contents</p>
+
+                    <div class="command">cat file1.txt file2.txt > combined.txt</div>
+                    <p>Combine files</p>
+                </div>
+
+                <div class="command-block">
+                    <h3>grep - Search Text</h3>
+                    <div class="command">grep "pattern" file.txt</div>
+                    <p>Find lines containing "pattern"</p>
+
+                    <div class="command">grep -i "pattern" file.txt</div>
+                    <p>Case-insensitive search</p>
+
+                    <div class="command">grep -r "pattern" directory</div>
+                    <p>Recursive search in directory</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>echo "Hello World"
+                                > greeting.txt</div>
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>grep "Hello"
+                                greeting.txt</div>
+                            <div class="output-row">Hello World</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-block">
+                    <h3>head and tail - View File Parts</h3>
+                    <div class="command">head -n 10 file.txt</div>
+                    <p>Show first 10 lines</p>
+
+                    <div class="command">tail -n 5 file.txt</div>
+                    <p>Show last 5 lines</p>
+
+                    <div class="command">tail -f log.txt</div>
+                    <p>Follow file updates in real-time</p>
+
+                    <div class="tip">
+                        <p><code>tail -f</code> is extremely useful for monitoring log files as they're being written
+                            to.</p>
+                    </div>
+                </div>
+
+                <div class="command-block">
+                    <h3>wc - Count Words, Lines, Characters</h3>
+                    <div class="command">wc file.txt</div>
+                    <p>Count lines, words, bytes</p>
+
+                    <div class="command">wc -l file.txt</div>
+                    <p>Count lines only</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>wc greeting.txt
+                            </div>
+                            <div class="output-row">1 2 12 greeting.txt</div>
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>wc -l greeting.txt
+                            </div>
+                            <div class="output-row">1 greeting.txt</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Command History and Completion</h2>
+
+                <div class="command-block">
+                    <h3>Command History</h3>
+                    <div class="command">history</div>
+                    <p>Show command history</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>history</div>
+                            <div class="output-row">1 ls
+                                2 cd Documents
+                                3 pwd
+                                4 cd ..
+                                5 echo "Hello World" > greeting.txt
+                                6 grep "Hello" greeting.txt</div>
+                        </div>
+                    </div>
+
+                    <div class="command">!42</div>
+                    <p>Run command number 42 from history</p>
+
+                    <div class="command">!!</div>
+                    <p>Run the previous command</p>
+                </div>
+
+                <div class="command-block">
+                    <h3>Tab Completion</h3>
+                    <p>Press Tab to:</p>
+                    <ul>
+                        <li>Complete file and directory names</li>
+                        <li>Complete command names</li>
+                        <li>Complete command options (in some shells)</li>
+                    </ul>
+
+                    <div class="tip">
+                        <p>Tab completion is one of the most time-saving features of the command line. Use it
+                            frequently!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Command Chaining</h2>
+
+                <div class="command-block">
+                    <div class="command">command1 && command2</div>
+                    <p>Run command2 only if command1 succeeds</p>
+
+                    <div class="command">command1 || command2</div>
+                    <p>Run command2 only if command1 fails</p>
+
+                    <div class="command">command1 ; command2</div>
+                    <p>Run command2 regardless of command1's outcome</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>mkdir project && cd
+                                project</div>
+                            <div class="command-row"><span class="prompt">username@hostname:~/project$</span></div>
+                        </div>
+                    </div>
+
+                    <div class="note">
+                        <p>Command chaining helps you create more complex operations without writing scripts.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Advanced Topics</h2>
+
+                <div class="command-block">
+                    <h3>File Permissions</h3>
+                    <div class="command">chmod 755 script.sh</div>
+                    <p>Set read, write, execute permissions</p>
+
+                    <div class="command">chmod +x script.sh</div>
+                    <p>Add execute permission</p>
+
+                    <div class="command">chown user:group file</div>
+                    <p>Change file ownership</p>
+                </div>
+
+                <div class="command-block">
+                    <h3>Process Management</h3>
+                    <div class="command">ps</div>
+                    <p>List current processes</p>
+
+                    <div class="command">ps aux</div>
+                    <p>List all processes in detail</p>
+
+                    <div class="command">kill PID</div>
+                    <p>Terminate process by ID</p>
+
+                    <div class="command">killall firefox</div>
+                    <p>Terminate processes by name</p>
+
+                    <div class="command">top</div>
+                    <p>Monitor processes in real-time</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>ps</div>
+                            <div class="output-row"> PID TTY TIME CMD
+                                1234 pts/0 00:00:01 bash
+                                5678 pts/0 00:00:00 ps</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-block">
+                    <h3>Searching Files</h3>
+                    <div class="command">find . -name "*.txt"</div>
+                    <p>Find .txt files in current directory</p>
+
+                    <div class="command">find /home -type d -name "Downloads"</div>
+                    <p>Find directories named Downloads</p>
+
+                    <div class="command">find . -type f -mtime -7</div>
+                    <p>Find files modified in last 7 days</p>
+
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="window-controls">
+                                <div class="control close"></div>
+                                <div class="control minimize"></div>
+                                <div class="control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="command-row"><span class="prompt">username@hostname:~$</span>find . -name
+                                "*.txt"</div>
+                            <div class="output-row">./files.txt
+                                ./greeting.txt</div>
+                        </div>
+                    </div>
+
+                    <div class="tip">
+                        <p>The <code>find</code> command is extremely powerful with many options. Check
+                            <code>man find</code> for all possibilities.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Resources for Further Learning</h2>
+
+                <div class="command-block">
+                    <ul>
+                        <li><strong>Online Tutorials</strong>: codecademy.com, linuxjourney.com</li>
+                        <li><strong>Books</strong>: "The Linux Command Line" by William Shotts</li>
+                        <li><strong>Practice</strong>: Try building small shell scripts to automate tasks</li>
+                        <li><strong>Community</strong>: Join Linux/Unix forums to learn from experienced users</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <h2>Summary</h2>
+
+                <div class="command-block">
+                    <p>The command line is a powerful interface that allows direct interaction with your computer's
+                        operating system. Mastering basic commands and understanding input/output redirection, pipes,
+                        and environment variables will significantly enhance your productivity and technical
+                        capabilities.</p>
+
+                    <p>Remember that practice is essential - the more you use the command line, the more comfortable and
+                        proficient you'll become.</p>
+                </div>
+            </div>
+
+            <footer>
+                <p>&copy; 2025 Command Line Basics. All rights reserved.</p>
+            </footer>
+        </div>
+
+</body>
+
+</html>
